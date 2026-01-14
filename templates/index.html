@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Talk to Budget</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>💬 Talk to Budget</h1>
+        <button id="recordBtn">🎙️ Start Recording</button>
+        <p id="statusMsg"></p>
+
+        <h2>🧾 Daily Expenses</h2>
+        {% for date, items in data.items() %}
+            <div class="day-box">
+                <h3>{{ date }}</h3>
+                <table>
+                    <tr><th>Item</th><th>Cost</th></tr>
+                    {% set total = 0 %}
+                    {% for i in items %}
+                        <tr><td>{{ i.item }}</td><td>{{ i.cost }}</td></tr>
+                        {% set total = total + i.cost %}
+                    {% endfor %}
+                    <tr class="total-row"><td>Total</td><td>{{ total }}</td></tr>
+                </table>
+            </div>
+        {% endfor %}
+    </div>
+
+    <script>
+        document.getElementById("recordBtn").addEventListener("click", function() {
+            const msg = document.getElementById("statusMsg");
+            msg.innerText = "🎙️ Talk now...";
+            fetch("/record")
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === "success") {
+                        msg.innerText = `✅ Recorded! Total ₹${data.total}`;
+                        setTimeout(() => location.reload(), 1500);
+                    } else {
+                        msg.innerText = "❌ " + data.message;
+                    }
+                })
+                .catch(() => msg.innerText = "❌ Error recording");
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Talk to Budget 💰</title>
+    <style>
+        body {
+            font-family: "Segoe UI", Arial, sans-serif;
+            background-color: #f8fafc;
+            text-align: center;
+            padding: 30px;
+        }
+        h1 {
+            color: #2b6cb0;
+        }
+        .container {
+            background: white;
+            margin: auto;
+            padding: 25px;
+            border-radius: 12px;
+            width: 70%;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+        }
+        table {
+            margin: 20px auto;
+            width: 90%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+        }
+        th {
+            background-color: #3182ce;
+            color: white;
+        }
+        .total {
+            font-weight: bold;
+            background-color: #bee3f8;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #48bb78;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+        button:hover {
+            background-color: #2f855a;
+        }
+        .delete-btn {
+            background-color: #e53e3e;
+        }
+        .delete-btn:hover {
+            background-color: #9b2c2c;
+        }
+        .day-box {
+            border: 2px solid #63b3ed;
+            border-radius: 10px;
+            margin: 15px;
+            padding: 15px;
+            background-color: #ebf8ff;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Talk to Budget 💬</h1>
+
+    <form action="/add" method="POST">
+        <button type="submit">🎤 Talk Now</button>
+    </form>
+
+    <h2>Today's Expenses ({{ today }})</h2>
+    {% if data %}
+    <table>
+        <tr>
+            <th>Item</th>
+            <th>Price (₹)</th>
+            <th>Action</th>
+        </tr>
+        {% for entry in data %}
+        <tr>
+            <td>{{ entry.item }}</td>
+            <td>{{ entry.price }}</td>
+            <td>
+                <form action="/delete/{{ loop.index0 }}" method="POST" style="display:inline;">
+                    <button type="submit" class="delete-btn">Delete</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+        <tr>
+            <td class="total">Total</td>
+            <td class="total">₹{{ total }}</td>
+            <td></td>
+        </tr>
+    </table>
+    {% else %}
+    <p>No expenses added yet for today.</p>
+    {% endif %}
+
+    <h2>Previous Days</h2>
+    {% for day, expenses in all_data.items() %}
+        {% if day != today %}
+        <div class="day-box">
+            <h3>{{ day }}</h3>
+            <table>
+                <tr><th>Item</th><th>Price (₹)</th></tr>
+                {% for entry in expenses %}
+                <tr>
+                    <td>{{ entry.item }}</td>
+                    <td>{{ entry.price }}</td>
+                </tr>
+                {% endfor %}
+                <tr>
+                    <td class="total">Total</td>
+                    <td class="total">₹{{ expenses | sum(attribute='price') }}</td>
+                </tr>
+            </table>
+        </div>
+        {% endif %}
+    {% endfor %}
+</div>
+
+</body>
+</html>
